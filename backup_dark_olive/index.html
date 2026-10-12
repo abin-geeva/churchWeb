@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizverse - Interactive QnA & Questionnaire Platform</title>
+  <meta name="description" content="Create, publish, and play live interactive QnA questionnaires and quizzes with friends and community. Just like Kahoot and Quizizz with real-time scoring!">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+
+  <!-- Fullscreen Particle Confetti Canvas -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand" onclick="window.quizApp.switchView('explore')">
+        <div class="brand-icon">⚡</div>
+        <div>
+          <span class="brand-name">Quizverse</span>
+          <span class="brand-badge">LIVE</span>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" data-view="explore" id="navExploreBtn" onclick="window.quizApp?.switchView('explore')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Explore Quizzes
+        </button>
+        <button class="nav-btn" data-view="builder" id="navBuilderBtn" onclick="window.quizApp?.resetBuilder(); window.quizApp?.switchView('builder')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Create Questionnaire
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="icon-btn" id="importModalBtn" title="Import Questionnaire JSON">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        </button>
+        <button class="icon-btn" id="audioToggleBtn" title="Toggle Sound">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Area -->
+  <main class="main-wrapper">
+
+    <!-- ==========================================
+         VIEW 1: EXPLORE / HUB
+         ========================================== -->
+    <section class="view-section active" id="viewExplore">
+      <!-- Hero Banner -->
+      <div class="hero-banner">
+        <div class="hero-glow-orb hero-glow-1"></div>
+        <div class="hero-glow-orb hero-glow-2"></div>
+
+        <div class="hero-content">
+          <span class="hero-tag">✨ Interactive Q&amp;A Hub</span>
+          <h1 class="hero-title">Create, Share &amp; Play <span class="gradient-text">Exciting Quizzes</span></h1>
+          <p class="hero-desc">
+            Build custom questionnaires with colorful choices and instant scoring. Challenge your friends, youth group, church, or classroom in real-time Kahoot-style gameplay!
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="heroCreateBtn" onclick="window.quizApp?.resetBuilder(); window.quizApp?.switchView('builder')">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Create New Questionnaire
+            </button>
+            <button class="btn btn-glass" onclick="document.getElementById('pinInput')?.focus()">
+              Join with Code
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick PIN Join Card -->
+        <div class="pin-join-card">
+          <h3 class="pin-join-title">Have a Quiz PIN?</h3>
+          <p class="pin-join-subtitle">Enter 6-digit code to jump straight into the arena</p>
+          <div class="pin-input-group">
+            <input type="text" class="pin-input" id="pinInput" placeholder="FAITH1" maxlength="8">
+            <button class="btn btn-primary btn-sm" id="pinJoinBtn">Join</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explore Quizzes Section -->
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+          </div>
+          <div>
+            <h2 class="section-title">Available Questionnaires</h2>
+            <p class="section-desc">Choose a questionnaire to play, challenge high scores, or inspect answers.</p>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <div class="search-input-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search by title, topic, or PIN...">
+          </div>
+          <button class="category-chip active" data-category="All">All</button>
+          <button class="category-chip" data-category="Faith & Church">Faith &amp; Church</button>
+          <button class="category-chip" data-category="General Trivia">General Trivia</button>
+          <button class="category-chip" data-category="Science">Science</button>
+        </div>
+      </div>
+
+      <!-- Quiz Cards Grid -->
+      <div class="quiz-grid" id="quizGrid">
+        <!-- Rendered by app.js -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 2: QUESTIONNAIRE BUILDER
+         ========================================== -->
+    <section class="view-section" id="viewBuilder">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </div>
+          <div>
+            <h2 class="section-title">Questionnaire Builder</h2>
+            <p class="section-desc">Add questions, design colorful answers, and publish for everyone to take.</p>
+          </div>
+        </div>
+        <div style="display:flex; gap:0.75rem;">
+          <button class="btn btn-glass" onclick="window.quizApp.switchView('explore')">Cancel</button>
+          <button class="btn btn-primary" onclick="window.quizApp.publishQuestionnaire()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Publish Questionnaire
+          </button>
+        </div>
+      </div>
+
+      <div class="builder-layout">
+        <!-- Main Form -->
+        <div class="builder-main">
+          <!-- Quiz Metadata Card -->
+          <div class="builder-card">
+            <div class="card-heading">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b8e23" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+              <span>Questionnaire Details</span>
+              <span class="quiz-code-badge" id="builderQuizPinBadge" style="margin-left: auto;">PIN: AUTO</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Questionnaire Title *</label>
+              <input type="text" class="form-input" id="builderQuizTitle" placeholder="e.g. Sunday Bible Trivia & History">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description / Subtitle</label>
+              <textarea class="form-textarea" id="builderQuizDesc" placeholder="Briefly describe what this questionnaire is about..."></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Category</label>
+                <select class="form-select" id="builderQuizCategory">
+                  <option value="Faith & Church">Faith &amp; Church</option>
+                  <option value="General Trivia" selected>General Trivia</option>
+                  <option value="Science">Science</option>
+                  <option value="History">History</option>
+                  <option value="Fun & Games">Fun &amp; Games</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Time Per Question</label>
+                <select class="form-select" id="builderQuizTimer">
+                  <option value="10">10 Seconds (Speed Run)</option>
+                  <option value="15">15 Seconds (Fast)</option>
+                  <option value="20" selected>20 Seconds (Standard)</option>
+                  <option value="30">30 Seconds (Relaxed)</option>
+                  <option value="60">60 Seconds (Long Thinking)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Question Editor Form -->
+          <div id="builderQuestionEditor">
+            <!-- Rendered by app.js -->
+          </div>
+        </div>
+
+        <!-- Sidebar Questions List -->
+        <aside class="builder-sidebar">
+          <div class="builder-card">
+            <div class="card-heading" style="justify-content: space-between;">
+              <span>Questions List</span>
+              <span class="quiz-category-tag" id="builderQuestionCountBadge">1 Question</span>
+            </div>
+
+            <div class="sidebar-questions-list" id="builderSidebarQuestions">
+              <!-- Rendered by app.js -->
+            </div>
+
+            <button class="btn btn-glass" style="width: 100%;" onclick="window.quizApp.addNewQuestion()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              + Add Another Question
+            </button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 3: PLAY / GAME ARENA
+         ========================================== -->
+    <section class="view-section" id="viewPlay">
+      <!-- Rendered dynamically by app.js (Lobby -> 3-2-1 Countdown -> Arena) -->
+    </section>
+
+    <!-- ==========================================
+         VIEW 4: RESULTS & LEADERBOARD
+         ========================================== -->
+    <section class="view-section" id="viewResults">
+      <!-- Rendered dynamically by app.js (Podium -> Stats -> Leaderboard -> Review) -->
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       MODAL: IMPORT JSON QUESTIONNAIRE
+       ========================================== -->
+  <div class="modal-overlay" id="importModal">
+    <div class="modal-content">
+      <button class="modal-close-btn">&times;</button>
+      <h3 style="font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 0.5rem; color:#fff;">
+        Import Questionnaire
+      </h3>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+        Paste a Questionnaire JSON snippet or choose a exported .json file from your computer.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">Upload .json file</label>
+        <input type="file" accept=".json" class="form-input" onchange="window.quizApp.handleFileImport(this)">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Or paste JSON content</label>
+        <textarea class="form-textarea" id="importJsonInput" style="height: 140px; font-family: monospace; font-size: 0.82rem;" placeholder='{"title": "My Quiz", "questions": [...]}'></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button class="btn btn-glass" onclick="document.getElementById('importModal').classList.remove('active')">Cancel</button>
+        <button class="btn btn-primary" onclick="window.quizApp.importJSONPayload()">Import Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Main JavaScript App Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
